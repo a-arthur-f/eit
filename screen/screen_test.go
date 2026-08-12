@@ -7,13 +7,13 @@ import (
 
 func TestClear(t *testing.T) {
 	s := Screen{
-		screen: [screenHeight][screenWidth]bool{
+		screen: [ScreenHeight][ScreenWidth]bool{
 			{true, true, false, false}, 
 			{true, true, true},
 		},
 	}
 
-	expected := [screenHeight][screenWidth]bool{}
+	expected := [ScreenHeight][ScreenWidth]bool{}
 
 	s.Clear()
 
@@ -52,7 +52,7 @@ func TestWrite(t *testing.T) {
 
 func TestRead(t *testing.T) {
 	s := Screen{
-		screen: [screenHeight][screenWidth]bool{{false, true}},
+		screen: [ScreenHeight][ScreenWidth]bool{{false, true}},
 	}
 
 	tests := []struct {
