@@ -1,6 +1,7 @@
 package cpu
 
 import (
+	"eit/font"
 	"eit/keyboard"
 	"eit/memory"
 	"eit/screen"
@@ -939,6 +940,30 @@ func TestFX1E(t *testing.T) {
 	cpu.Cycle()
 
 	want := uint16(0xff + 0xf)
+	got := cpu.i
+
+	if got != want {
+		t.Errorf("opcode 0x%.4x\ngot I 0x%.4x\nwant 0x%.4x", opcode, got, want)
+	}
+
+	wantPc := uint16(0x202)
+
+	if cpu.pc != wantPc {
+		t.Errorf("opcode 0x%.4x\ngot PC 0x%.4x\nwant 0x%.4x", opcode, cpu.pc, wantPc)
+	}
+}
+
+func TestFX29(t *testing.T) {
+	opcode := uint16(0xf029)
+	loadOpcode(&mem, opcode)
+
+	cpu := New(&mem, &scr, &key)
+	cpu.v[0x0] = 0xf
+	cpu.Cycle()
+
+	addr := font.Address(0xf)
+
+	want := addr
 	got := cpu.i
 
 	if got != want {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 
+	"eit/font"
 	"eit/keyboard"
 	"eit/memory"
 	"eit/screen"
@@ -317,6 +318,8 @@ func (cpu *CPU) execute(opcode uint8) {
 			cpu.timer_sound = cpu.v[index]
 		case 0x1e:
 			cpu.i += uint16(cpu.v[index])
+		case 0x29:
+			cpu.i += font.Address(cpu.v[index])
 		}
 
 		cpu.pc += 2
