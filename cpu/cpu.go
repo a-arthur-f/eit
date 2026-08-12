@@ -271,7 +271,7 @@ func (cpu *CPU) execute(opcode uint8) {
 
 		switch instruction {
 		case 0x9e:
-			if cpu.keyboard.Read(keyAddr){
+			if cpu.keyboard.Read(keyAddr) {
 				cpu.pc += 4
 			} else {
 				cpu.pc += 2
@@ -283,7 +283,18 @@ func (cpu *CPU) execute(opcode uint8) {
 				cpu.pc += 4
 			}
 		}
+	case 0xf0:
+		addr := cpu.getAddress()
 
+		instruction := addr & 0x0ff
+		index := addr & 0xf00 >> 8
+
+		switch instruction {
+		case 0x07:
+			cpu.v[index] = cpu.timer_delay
+		}
+		
+		cpu.pc += 2
 	default:
 		fmt.Printf("unknow opcode 0x%.2x on adress 0x%.2x\n", opcode, cpu.pc)
 	}
