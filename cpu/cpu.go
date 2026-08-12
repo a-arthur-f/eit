@@ -313,6 +313,8 @@ func (cpu *CPU) execute(opcode uint8) {
 			cpu.waitingInput = true
 		case 0x15:
 			cpu.timer_delay = cpu.v[index]
+		case 0x18:
+			cpu.timer_sound = cpu.v[index]
 		}
 
 		cpu.pc += 2
