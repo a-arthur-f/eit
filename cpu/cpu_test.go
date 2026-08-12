@@ -1,6 +1,7 @@
 package cpu
 
 import (
+	"eit/keyboard"
 	"eit/memory"
 	"eit/screen"
 	"reflect"
@@ -9,6 +10,7 @@ import (
 
 var scr = screen.Screen{}
 var mem = memory.Memory{}
+var key = keyboard.Keyboard{}
 
 func Test00E0(t *testing.T) {
 	opcode := uint16(0x00e0)
@@ -19,7 +21,7 @@ func Test00E0(t *testing.T) {
 
 	scr.Write(x, y, true)
 
-	cpu := New(&mem, &scr)
+	cpu := New(&mem, &scr, &key)
 	cpu.Cycle()
 
 	expected := false
@@ -43,7 +45,7 @@ func Test00EE(t *testing.T) {
 	expectedPc := uint16(0x100)
 	expectedSp := uint8(0)
 
-	cpu := New(&mem, &scr)
+	cpu := New(&mem, &scr, &key)
 	cpu.push(expectedPc)
 
 	cpu.Cycle()
@@ -66,7 +68,7 @@ func Test1NNN(t *testing.T) {
 
 	expected := uint16(0x0ff)
 
-	cpu := New(&mem, &scr)
+	cpu := New(&mem, &scr, &key)
 	cpu.Cycle()
 
 	got := cpu.pc
@@ -84,7 +86,7 @@ func Test2NNN(t *testing.T) {
 	expectedSp := uint8(1)
 	expectedStack := [16]uint16{0x202}
 
-	cpu := New(&mem, &scr)
+	cpu := New(&mem, &scr, &key)
 	cpu.Cycle()
 
 	gotPc := cpu.pc
@@ -109,7 +111,7 @@ func Test3XNN(t *testing.T) {
 		opcode := 0x3000 | uint16(x)<<8 | uint16(x)
 		loadOpcode(&mem, opcode)
 
-		cpu := New(&mem, &scr)
+		cpu := New(&mem, &scr, &key)
 		cpu.v[x] = uint8(x)
 		cpu.Cycle()
 
@@ -138,7 +140,7 @@ func Test4XNN(t *testing.T) {
 		opcode := 0x4000 | uint16(x)<<8 | uint16(x)
 		loadOpcode(&mem, opcode)
 
-		cpu := New(&mem, &scr)
+		cpu := New(&mem, &scr, &key)
 		cpu.v[x] = uint8(x)
 		cpu.Cycle()
 
@@ -168,7 +170,7 @@ func Test5XY0(t *testing.T) {
 		opcode := 0x5000 | uint16(x)<<8 | uint16(y)<<4
 		loadOpcode(&mem, opcode)
 
-		cpu := New(&mem, &scr)
+		cpu := New(&mem, &scr, &key)
 		cpu.v[x] = uint8(x)
 		cpu.v[y] = uint8(x)
 		cpu.Cycle()
@@ -200,7 +202,7 @@ func Test6XNN(t *testing.T) {
 		opcode := 0x6000 | uint16(x)<<8 | uint16(wantV)
 		loadOpcode(&mem, opcode)
 
-		cpu := New(&mem, &scr)
+		cpu := New(&mem, &scr, &key)
 		cpu.Cycle()
 
 		gotV := cpu.v[x]
@@ -222,7 +224,7 @@ func Test7XNN(t *testing.T) {
 		opcode := 0x7000 | uint16(x)<<8 | uint16(x)
 		loadOpcode(&mem, opcode)
 
-		cpu := New(&mem, &scr)
+		cpu := New(&mem, &scr, &key)
 		cpu.v[x] = uint8(x * 2)
 
 		wantV := cpu.v[x] + uint8(x)
@@ -250,7 +252,7 @@ func Test8XY0(t *testing.T) {
 		opcode := 0x8000 | uint16(x)<<8 | uint16(y)<<4
 		loadOpcode(&mem, opcode)
 
-		cpu := New(&mem, &scr)
+		cpu := New(&mem, &scr, &key)
 		cpu.v[y] = uint8(y * 2)
 		cpu.Cycle()
 
@@ -273,7 +275,7 @@ func Test8XY1(t *testing.T) {
 		opcode := 0x8000 | uint16(x)<<8 | uint16(y)<<4 | 0x1
 		loadOpcode(&mem, opcode)
 
-		cpu := New(&mem, &scr)
+		cpu := New(&mem, &scr, &key)
 		cpu.v[x] = uint8(x * 3)
 		cpu.v[y] = uint8(y)
 
@@ -302,7 +304,7 @@ func Test8XY2(t *testing.T) {
 		opcode := 0x8000 | uint16(x)<<8 | uint16(y)<<4 | 0x2
 		loadOpcode(&mem, opcode)
 
-		cpu := New(&mem, &scr)
+		cpu := New(&mem, &scr, &key)
 		cpu.v[x] = uint8(x * 3)
 		cpu.v[y] = uint8(y)
 
@@ -331,7 +333,7 @@ func Test8XY3(t *testing.T) {
 		opcode := 0x8000 | uint16(x)<<8 | uint16(y)<<4 | 0x3
 		loadOpcode(&mem, opcode)
 
-		cpu := New(&mem, &scr)
+		cpu := New(&mem, &scr, &key)
 		cpu.v[x] = uint8(x * 3)
 		cpu.v[y] = uint8(y)
 
@@ -360,7 +362,7 @@ func Test8XY4(t *testing.T) {
 		opcode := 0x8000 | uint16(x)<<8 | uint16(y)<<4 | 0x4
 		loadOpcode(&mem, opcode)
 
-		cpu := New(&mem, &scr)
+		cpu := New(&mem, &scr, &key)
 		cpu.v[x] = uint8(x)
 		cpu.v[y] = uint8(y)
 
@@ -402,7 +404,7 @@ func Test8XY5(t *testing.T) {
 		opcode := 0x8000 | uint16(x)<<8 | uint16(y)<<4 | 0x5
 		loadOpcode(&mem, opcode)
 
-		cpu := New(&mem, &scr)
+		cpu := New(&mem, &scr, &key)
 		cpu.v[x] = uint8(x)
 		cpu.v[y] = uint8(y)
 
@@ -444,7 +446,7 @@ func Test8XY6(t *testing.T) {
 		opcode := 0x8000 | uint16(x)<<8 | uint16(y)<<4 | 0x6
 		loadOpcode(&mem, opcode)
 
-		cpu := New(&mem, &scr)
+		cpu := New(&mem, &scr, &key)
 		cpu.v[x] = uint8(x)
 		cpu.v[y] = uint8(y)
 
@@ -499,7 +501,7 @@ func Test8XY7(t *testing.T) {
 		opcode := 0x8000 | uint16(x)<<8 | uint16(y)<<4 | 0x7
 		loadOpcode(&mem, opcode)
 
-		cpu := New(&mem, &scr)
+		cpu := New(&mem, &scr, &key)
 		cpu.v[x] = uint8(x)
 		cpu.v[y] = uint8(y)
 
@@ -541,7 +543,7 @@ func Test8XYE(t *testing.T) {
 		opcode := 0x8000 | uint16(x)<<8 | uint16(y)<<4 | 0xe
 		loadOpcode(&mem, opcode)
 
-		cpu := New(&mem, &scr)
+		cpu := New(&mem, &scr, &key)
 		cpu.v[x] = uint8(x)
 		cpu.v[y] = uint8(y)
 
@@ -595,7 +597,7 @@ func Test9XY0(t *testing.T) {
 		opcode := 0x9000 | uint16(x)<<8 | uint16(y)<<4
 		loadOpcode(&mem, opcode)
 
-		cpu := New(&mem, &scr)
+		cpu := New(&mem, &scr, &key)
 		cpu.v[x] = uint8(x)
 		cpu.v[y] = uint8(x)
 		cpu.Cycle()
@@ -626,7 +628,7 @@ func TestANNN(t *testing.T) {
 	opcode := uint16(0xa000) | want
 	loadOpcode(&mem, opcode)
 
-	cpu := New(&mem, &scr)
+	cpu := New(&mem, &scr, &key)
 	cpu.Cycle()
 
 	got := cpu.i
@@ -646,7 +648,7 @@ func TestBNNN(t *testing.T) {
 	opcode := uint16(0xbf22)
 	loadOpcode(&mem, opcode)
 
-	cpu := New(&mem, &scr)
+	cpu := New(&mem, &scr, &key)
 	cpu.v[0x0] = 0x22
 
 	wantPc := uint16(cpu.v[0x0]) + 0xf22
@@ -662,7 +664,7 @@ func TestCXNN(t *testing.T) {
 	opcode := uint16(0xc00f)
 	loadOpcode(&mem, opcode)
 
-	cpu := New(&mem, &scr)
+	cpu := New(&mem, &scr, &key)
 	cpu.Cycle()	
 
 	if cpu.v[0x0] > 0x0f {
@@ -701,7 +703,7 @@ func TestDXYN(t *testing.T) {
 	opcode := uint16(0xd018)
 	loadOpcode(&mem, opcode)
 
-	cpu := New(&mem, &scr)
+	cpu := New(&mem, &scr, &key)
 
 	cpu.v[0x0] = 27
 	cpu.v[0x1] = 11

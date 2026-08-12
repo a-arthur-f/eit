@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 
+	"eit/keyboard"
 	"eit/memory"
 	"eit/screen"
 )
@@ -19,15 +20,17 @@ type CPU struct {
 	timer_delay uint8
 	timer_sound uint8
 
-	mem    *memory.Memory
-	screen *screen.Screen
+	mem      *memory.Memory
+	screen   *screen.Screen
+	keyboard *keyboard.Keyboard
 }
 
-func New(mem *memory.Memory, screen *screen.Screen) CPU {
+func New(mem *memory.Memory, screen *screen.Screen, keyboard *keyboard.Keyboard) CPU {
 	return CPU{
 		pc:     0x200,
 		mem:    mem,
 		screen: screen,
+		keyboard: keyboard,
 	}
 }
 
@@ -243,7 +246,7 @@ func (cpu *CPU) execute(opcode uint8) {
 			cols := cpu.mem.Read(cpu.i + line)
 
 			for col := 0x7; col >= 0; col-- {
-				x := cpu.v[xIndex] + (0x7 - uint8(col)) % screen.ScreenWidth
+				x := cpu.v[xIndex] + (0x7-uint8(col))%screen.ScreenWidth
 				y := (cpu.v[yIndex] + uint8(line)) % screen.ScreenHeight
 
 				spriteBit := ((cols & uint8(1<<col)) >> col) != 0
