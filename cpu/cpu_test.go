@@ -885,6 +885,28 @@ func TestFX0A(t *testing.T) {
 	}
 }
 
+func TestFX15(t *testing.T) {
+	opcode := uint16(0xf015)
+	loadOpcode(&mem, opcode)
+
+	cpu := New(&mem, &scr, &key)
+	cpu.v[0x0] = 0xff
+	cpu.Cycle()
+
+	want := uint8(0xff)
+	got := cpu.timer_delay
+
+	if got != want {
+		t.Errorf("opcode 0x%.4x\ngot Delay 0x%.2x\nwant 0x%.2x", opcode, got, want)
+	}
+
+	wantPc := uint16(0x202)
+
+	if cpu.pc != wantPc {
+		t.Errorf("opcode 0x%.4x\ngot PC 0x%.4x\nwant 0x%.4x", opcode, cpu.pc, wantPc)
+	}
+}
+
 func TestLoadOpcode(t *testing.T) {
 	loadOpcode(&mem, 0x20ff)
 
