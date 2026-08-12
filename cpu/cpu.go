@@ -23,6 +23,8 @@ type CPU struct {
 	mem      *memory.Memory
 	screen   *screen.Screen
 	keyboard *keyboard.Keyboard
+
+	waitingInput bool
 }
 
 func New(mem *memory.Memory, screen *screen.Screen, keyboard *keyboard.Keyboard) CPU {
@@ -35,8 +37,23 @@ func New(mem *memory.Memory, screen *screen.Screen, keyboard *keyboard.Keyboard)
 }
 
 func (cpu *CPU) Cycle() {
+	if cpu.waitingInput {
+		return
+	}
+
 	opcode := cpu.mem.Read(cpu.pc)
 	cpu.execute(opcode)
+}
+
+func (cpu *CPU) Input(key uint8) {
+	index := (cpu.getAddress() & 0xf00) >> 8
+	cpu.v[index] = key
+	
+	cpu.waitingInput = false
+}
+
+func (cpu CPU) WaitingInput() bool {
+	return cpu.waitingInput
 }
 
 func (cpu *CPU) execute(opcode uint8) {
@@ -292,8 +309,10 @@ func (cpu *CPU) execute(opcode uint8) {
 		switch instruction {
 		case 0x07:
 			cpu.v[index] = cpu.timer_delay
+		case 0x0a:
+			cpu.waitingInput = true
 		}
-		
+
 		cpu.pc += 2
 	default:
 		fmt.Printf("unknow opcode 0x%.2x on adress 0x%.2x\n", opcode, cpu.pc)

@@ -845,6 +845,46 @@ func TestFX07(t *testing.T) {
 	}
 }
 
+func TestFX0A(t *testing.T) {
+	opcode := uint16(0xf00a)
+	loadOpcode(&mem, opcode)
+
+	cpu := New(&mem, &scr, &key)
+	cpu.Cycle()
+	cpu.Cycle()
+	cpu.Cycle()
+
+	wantPc := uint16(0x202)
+
+	if cpu.pc != wantPc {
+		t.Errorf("opcode 0x%.4x\ngot PC 0x%.4x\nwant 0x%.4x", opcode, cpu.pc, wantPc)
+	}
+
+	wantWaiting := true
+	gotWaiting := cpu.waitingInput
+
+	if gotWaiting != wantWaiting {
+		t.Errorf("opcode 0x%.4x\ngot waiting == %v\nwant %v", opcode, gotWaiting, wantWaiting)
+	}
+
+	cpu.Input(0xf)
+
+	wantWaiting = false
+	gotWaiting = cpu.waitingInput
+
+	if gotWaiting != wantWaiting {
+		t.Errorf("opcode 0x%.4x\ngot waiting == %v\nwant %v", opcode, gotWaiting, wantWaiting)
+	}
+
+
+	want := uint8(0xf)
+	got := cpu.v[0x0]
+
+	if got != want {
+		t.Errorf("opcode 0x%.4x\ngot V[%d] 0x%.2x\nwant 0x%.2x", opcode, 0x0, got, want)
+	}
+}
+
 func TestLoadOpcode(t *testing.T) {
 	loadOpcode(&mem, 0x20ff)
 
