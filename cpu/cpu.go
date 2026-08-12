@@ -315,6 +315,8 @@ func (cpu *CPU) execute(opcode uint8) {
 			cpu.timer_delay = cpu.v[index]
 		case 0x18:
 			cpu.timer_sound = cpu.v[index]
+		case 0x1e:
+			cpu.i += uint16(cpu.v[index])
 		}
 
 		cpu.pc += 2
