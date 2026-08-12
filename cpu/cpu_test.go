@@ -773,6 +773,56 @@ func TestDXYN(t *testing.T) {
 	}
 }
 
+func TestEX9E(t *testing.T) {
+	opcode := uint16(0xe09e)
+	loadOpcode(&mem, opcode)
+
+	cpu := New(&mem, &scr, &key)
+	cpu.v[0] = 0x0
+	cpu.Cycle()
+
+	wantPc := uint16(0x202)
+	
+	if cpu.pc != wantPc {
+		t.Errorf("opcode 0x%.4x\ngot PC 0x%.4x\nwant 0x%.4x", opcode, cpu.pc, wantPc)
+	}
+
+	cpu.keyboard.Set(0x0)
+	cpu.pc = 0x200
+	cpu.Cycle()
+
+	wantPc = uint16(0x204)
+
+	if cpu.pc != wantPc {
+		t.Errorf("opcode 0x%.4x\ngot PC 0x%.4x\nwant 0x%.4x", opcode, cpu.pc, wantPc)
+	}
+}
+
+func TestEXA1(t *testing.T) {
+	opcode := uint16(0xe0a1)
+	loadOpcode(&mem, opcode)
+
+	cpu := New(&mem, &scr, &key)
+	cpu.v[0] = 0x1
+	cpu.Cycle()
+
+	wantPc := uint16(0x204)
+	
+	if cpu.pc != wantPc {
+		t.Errorf("opcode 0x%.4x\ngot PC 0x%.4x\nwant 0x%.4x", opcode, cpu.pc, wantPc)
+	}
+
+	cpu.keyboard.Set(0x1)
+	cpu.pc = 0x200
+	cpu.Cycle()
+
+	wantPc = uint16(0x202)
+
+	if cpu.pc != wantPc {
+		t.Errorf("opcode 0x%.4x\ngot PC 0x%.4x\nwant 0x%.4x", opcode, cpu.pc, wantPc)
+	}
+}
+
 func TestLoadOpcode(t *testing.T) {
 	loadOpcode(&mem, 0x20ff)
 

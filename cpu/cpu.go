@@ -27,9 +27,9 @@ type CPU struct {
 
 func New(mem *memory.Memory, screen *screen.Screen, keyboard *keyboard.Keyboard) CPU {
 	return CPU{
-		pc:     0x200,
-		mem:    mem,
-		screen: screen,
+		pc:       0x200,
+		mem:      mem,
+		screen:   screen,
 		keyboard: keyboard,
 	}
 }
@@ -262,6 +262,28 @@ func (cpu *CPU) execute(opcode uint8) {
 		}
 
 		cpu.pc += 2
+	case 0xe0:
+		addr := cpu.getAddress()
+
+		instruction := addr & 0x0ff
+		index := (opcode & 0x0f) >> 4
+		keyAddr := cpu.v[index]
+
+		switch instruction {
+		case 0x9e:
+			if cpu.keyboard.Read(keyAddr){
+				cpu.pc += 4
+			} else {
+				cpu.pc += 2
+			}
+		case 0xa1:
+			if cpu.keyboard.Read(keyAddr) {
+				cpu.pc += 2
+			} else {
+				cpu.pc += 4
+			}
+		}
+
 	default:
 		fmt.Printf("unknow opcode 0x%.2x on adress 0x%.2x\n", opcode, cpu.pc)
 	}
