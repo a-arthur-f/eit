@@ -336,6 +336,12 @@ func (cpu *CPU) execute(opcode uint8) {
 			}
 			
 			cpu.i += index + 1
+		case 0x65:	
+			for i := range index + 1 {
+				cpu.v[i] = cpu.mem.Read(cpu.i + i)
+			}
+			
+			cpu.i += index + 1
 		}
 
 		cpu.pc += 2
