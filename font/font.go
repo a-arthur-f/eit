@@ -24,3 +24,7 @@ var fonts = [16][5]uint8{
 func Address(char uint8) uint16 {
 	return start + uint16((char * 5))
 }
+
+func Fonts() [16][5]uint8 {
+	return fonts
+}
