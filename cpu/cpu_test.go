@@ -1026,6 +1026,43 @@ func TestFX33(t *testing.T) {
 	}
 }
 
+func TestFX55(t *testing.T) {
+	opcode := uint16(0xf555)
+	loadOpcode(&mem, opcode)
+
+	cpu := New(&mem, &scr, &key)
+	cpu.v[0] = 0xf
+	cpu.v[1] = 0x2
+	cpu.v[2] = 0xf0
+	cpu.v[3] = 0xf4
+	cpu.v[4] = 0xba
+	cpu.v[5] = 0xc0
+
+	initialAddr := uint16(0x50)
+	cpu.i = initialAddr
+
+	cpu.Cycle()
+
+	for i := initialAddr; i <= initialAddr + 5; i++ {
+		want := cpu.v[i - initialAddr] 
+		got := cpu.mem.Read(i)
+
+		if got != want {
+			t.Errorf("opcode 0x%.4x\ngot mem[0x%.4x] 0x%.2x\nwant 0x%.2x", opcode, i, got, want)
+		}
+	}
+
+	if cpu.i != 0x56 {
+		t.Errorf("opcode 0x%.4x\ngot I 0x%.4x\nwant 0x0056", opcode, cpu.i)
+	}
+
+	wantPc := uint16(0x202)
+
+	if cpu.pc != wantPc {
+		t.Errorf("opcode 0x%.4x\ngot PC 0x%.4x\nwant 0x%.4x", opcode, cpu.pc, wantPc)
+	}
+}
+
 func TestLoadOpcode(t *testing.T) {
 	loadOpcode(&mem, 0x20ff)
 

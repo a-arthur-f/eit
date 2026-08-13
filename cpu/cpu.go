@@ -329,7 +329,13 @@ func (cpu *CPU) execute(opcode uint8) {
 
 			cpu.mem.Write(cpu.i, hundreds)
 			cpu.mem.Write(cpu.i + 1, tens)
-			cpu.mem.Write(cpu.i + 2, ones)	
+			cpu.mem.Write(cpu.i + 2, ones)
+		case 0x55:	
+			for i := range index + 1 {
+				cpu.mem.Write(cpu.i + i, cpu.v[i])
+			}
+			
+			cpu.i += index + 1
 		}
 
 		cpu.pc += 2
