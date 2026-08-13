@@ -13,6 +13,30 @@ var scr = screen.Screen{}
 var mem = memory.Memory{}
 var key = keyboard.Keyboard{}
 
+func TestTimerDealay(t *testing.T) {
+	cpu := New(&mem, &scr, &key)
+	cpu.timer_delay = 2
+
+	cpu.TickTimers()
+	cpu.TickTimers()
+
+	if cpu.timer_delay != 0 {
+		t.Errorf("got delay timer %d\nwant %d", 0, cpu.timer_delay)
+	}
+}
+
+func TestTimerSound(t *testing.T) {
+	cpu := New(&mem, &scr, &key)
+	cpu.timer_sound = 2
+
+	cpu.TickTimers()
+	cpu.TickTimers()
+
+	if cpu.timer_delay != 0 {
+		t.Errorf("got sound timer %d\nwant %d", 0, cpu.timer_sound)
+	}
+}
+
 func Test00E0(t *testing.T) {
 	opcode := uint16(0x00e0)
 	loadOpcode(&mem, opcode)

@@ -57,6 +57,16 @@ func (cpu CPU) WaitingInput() bool {
 	return cpu.waitingInput
 }
 
+func (cpu *CPU) TickTimers() {
+	if cpu.timer_delay > 0 {
+		cpu.timer_delay--
+	}
+
+	if cpu.timer_sound > 0 {
+		cpu.timer_sound--
+	}
+}
+
 func (cpu *CPU) execute(opcode uint8) {
 	switch opcode & 0xf0 {
 	case 0x00:
