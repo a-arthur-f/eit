@@ -6,7 +6,11 @@ import (
 	"eit/keyboard"
 	"eit/memory"
 	"eit/screen"
+	"time"
 )
+
+const cpuFrequency = time.Second / 500
+const timerFrequency = time.Second / 60
 
 type Eit struct {
 	mem *memory.Memory
@@ -29,15 +33,35 @@ func New() Eit {
 }
 
 func (eit *Eit) Run() {
+	lastCycle := time.Now()
+
+	cpuAcc := time.Duration(0)
+	timerAcc := time.Duration(0)
+
 	for {
+		now := time.Now()
+		elapsed := now.Sub(lastCycle)
+		lastCycle = now
+
+		cpuAcc += elapsed
+		timerAcc += elapsed
+		
+		for cpuAcc >= cpuFrequency {
+			eit.cpu.Cycle()	
+			cpuAcc--
+		}
+
+		for timerAcc >= timerFrequency {
+			eit.cpu.TickTimers()
+			timerAcc--
+		}
+
 		if eit.cpu.WaitingInput() {
 			key := uint8(0x0)
 			// handle input
 			eit.cpu.Input(key)
 		}
 
-		eit.cpu.Cycle()	
-		eit.cpu.TickTimers()
 
 		// handle graphics
 	}
