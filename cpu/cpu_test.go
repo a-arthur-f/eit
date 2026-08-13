@@ -283,7 +283,7 @@ func Test8XY1(t *testing.T) {
 		want := cpu.v[x] | cpu.v[y]
 
 		cpu.Cycle()
-		
+
 		got := cpu.v[x]
 
 		if got != want {
@@ -312,7 +312,7 @@ func Test8XY2(t *testing.T) {
 		want := cpu.v[x] & cpu.v[y]
 
 		cpu.Cycle()
-		
+
 		got := cpu.v[x]
 
 		if got != want {
@@ -341,7 +341,7 @@ func Test8XY3(t *testing.T) {
 		want := cpu.v[x] ^ cpu.v[y]
 
 		cpu.Cycle()
-		
+
 		got := cpu.v[x]
 
 		if got != want {
@@ -666,7 +666,7 @@ func TestCXNN(t *testing.T) {
 	loadOpcode(&mem, opcode)
 
 	cpu := New(&mem, &scr, &key)
-	cpu.Cycle()	
+	cpu.Cycle()
 
 	if cpu.v[0x0] > 0x0f {
 		t.Errorf("opcode 0x%.4x\ngot value greater than 0x0f", opcode)
@@ -783,7 +783,7 @@ func TestEX9E(t *testing.T) {
 	cpu.Cycle()
 
 	wantPc := uint16(0x202)
-	
+
 	if cpu.pc != wantPc {
 		t.Errorf("opcode 0x%.4x\ngot PC 0x%.4x\nwant 0x%.4x", opcode, cpu.pc, wantPc)
 	}
@@ -808,7 +808,7 @@ func TestEXA1(t *testing.T) {
 	cpu.Cycle()
 
 	wantPc := uint16(0x204)
-	
+
 	if cpu.pc != wantPc {
 		t.Errorf("opcode 0x%.4x\ngot PC 0x%.4x\nwant 0x%.4x", opcode, cpu.pc, wantPc)
 	}
@@ -834,7 +834,7 @@ func TestFX07(t *testing.T) {
 
 	want := cpu.timer_delay
 	got := cpu.v[0x2]
-	
+
 	if got != want {
 		t.Errorf("opcode 0x%.4x\ngot V[%d] 0x%.2x\nwant 0x%.2x", opcode, 2, got, want)
 	}
@@ -876,7 +876,6 @@ func TestFX0A(t *testing.T) {
 	if gotWaiting != wantWaiting {
 		t.Errorf("opcode 0x%.4x\ngot waiting == %v\nwant %v", opcode, gotWaiting, wantWaiting)
 	}
-
 
 	want := uint8(0xf)
 	got := cpu.v[0x0]
@@ -968,6 +967,56 @@ func TestFX29(t *testing.T) {
 
 	if got != want {
 		t.Errorf("opcode 0x%.4x\ngot I 0x%.4x\nwant 0x%.4x", opcode, got, want)
+	}
+
+	wantPc := uint16(0x202)
+
+	if cpu.pc != wantPc {
+		t.Errorf("opcode 0x%.4x\ngot PC 0x%.4x\nwant 0x%.4x", opcode, cpu.pc, wantPc)
+	}
+}
+
+func TestFX33(t *testing.T) {
+	opcode := uint16(0xf033)
+	loadOpcode(&mem, opcode)
+
+	tests := []struct {
+		name  string
+		value uint8
+		want1 uint8
+		want2 uint8
+		want3 uint8
+	}{
+		{name: "255", value: 0xff, want1: 2, want2: 5, want3: 5},
+		{name: "15", value: 0xf, want1: 0, want2: 1, want3: 5},
+		{name: "5", value: 0x5, want1: 0, want2: 0, want3: 5},
+	}
+
+	cpu := New(&mem, &scr, &key)
+	cpu.i = 0x50
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cpu.pc = 0x200
+			cpu.v[0x0] = tt.value
+			cpu.Cycle()
+
+			got1 := cpu.mem.Read(cpu.i)
+			got2 := cpu.mem.Read(cpu.i + 1)
+			got3 := cpu.mem.Read(cpu.i + 2)
+
+			if got1 != tt.want1 {
+				t.Errorf("opcode 0x%.4x\ngot first digit %d\nwant %d", opcode, got1, tt.want1)
+			}
+
+			if got2 != tt.want2 {
+				t.Errorf("opcode 0x%.4x\ngot second digit %d\nwant %d", opcode, got3, tt.want3)
+			}
+
+			if got3 != tt.want3 {
+				t.Errorf("opcode 0x%.4x\ngot third digit %d\nwant %d", opcode, got3, tt.want3)
+			}
+		})
 	}
 
 	wantPc := uint16(0x202)

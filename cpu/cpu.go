@@ -320,6 +320,16 @@ func (cpu *CPU) execute(opcode uint8) {
 			cpu.i += uint16(cpu.v[index])
 		case 0x29:
 			cpu.i += font.Address(cpu.v[index])
+		case 0x33:
+			number := cpu.v[index]
+
+			hundreds := number / 100
+			tens := (number / 10) %10
+			ones := number % 10
+
+			cpu.mem.Write(cpu.i, hundreds)
+			cpu.mem.Write(cpu.i + 1, tens)
+			cpu.mem.Write(cpu.i + 2, ones)	
 		}
 
 		cpu.pc += 2
