@@ -3,10 +3,18 @@ package eit
 import (
 	"eit/font"
 	"testing"
+
+	"github.com/Zyko0/go-sdl3/bin/binsdl"
 )
 
 func TestInitialize(t *testing.T) {
-	eit := New()
+	defer binsdl.Load().Unload()
+
+	eit, err := New()
+
+	if err != nil {
+		t.Errorf("failed to initialize: %v", err)
+	}
 
 	fonts := font.Fonts()
 	totalBytes := 16 * 5
@@ -21,10 +29,19 @@ func TestInitialize(t *testing.T) {
 			}
 		}
 	}
+
+	eit.Destroy()
 }
 
 func TestLoadRom(t *testing.T) {
-	eit := New()
+	defer binsdl.Load().Unload()
+
+	eit, err := New()
+
+	if err != nil {
+		t.Errorf("failed to initialize: %v", err)
+	}
+
 	rom := []byte{0x00, 0xff, 0xca, 0x44}
 	eit.LoadRom(rom)
 
@@ -35,4 +52,6 @@ func TestLoadRom(t *testing.T) {
 			t.Errorf("wrong rom byte loaded at mem[0x%.4x]\ngot 0x%.4x\nwant 0x%.4x", 0x200 + i, b, memByte)
 		}
 	}
+
+	eit.Destroy()
 }
