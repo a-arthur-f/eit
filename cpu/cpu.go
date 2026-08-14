@@ -49,7 +49,7 @@ func (cpu *CPU) Cycle() {
 func (cpu *CPU) Input(key uint8) {
 	index := (cpu.getAddress() & 0xf00) >> 8
 	cpu.v[index] = key
-	
+
 	cpu.waitingInput = false
 }
 
@@ -274,7 +274,7 @@ func (cpu *CPU) execute(opcode uint8) {
 			cols := cpu.mem.Read(cpu.i + line)
 
 			for col := 0x7; col >= 0; col-- {
-				x := cpu.v[xIndex] + (0x7-uint8(col))%screen.ScreenWidth
+				x := (cpu.v[xIndex] + (0x7-uint8(col)))%screen.ScreenWidth
 				y := (cpu.v[yIndex] + uint8(line)) % screen.ScreenHeight
 
 				spriteBit := ((cols & uint8(1<<col)) >> col) != 0
@@ -334,23 +334,23 @@ func (cpu *CPU) execute(opcode uint8) {
 			number := cpu.v[index]
 
 			hundreds := number / 100
-			tens := (number / 10) %10
+			tens := (number / 10) % 10
 			ones := number % 10
 
 			cpu.mem.Write(cpu.i, hundreds)
-			cpu.mem.Write(cpu.i + 1, tens)
-			cpu.mem.Write(cpu.i + 2, ones)
-		case 0x55:	
+			cpu.mem.Write(cpu.i+1, tens)
+			cpu.mem.Write(cpu.i+2, ones)
+		case 0x55:
 			for i := range index + 1 {
-				cpu.mem.Write(cpu.i + i, cpu.v[i])
+				cpu.mem.Write(cpu.i+i, cpu.v[i])
 			}
-			
+
 			cpu.i += index + 1
-		case 0x65:	
+		case 0x65:
 			for i := range index + 1 {
 				cpu.v[i] = cpu.mem.Read(cpu.i + i)
 			}
-			
+
 			cpu.i += index + 1
 		}
 
