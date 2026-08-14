@@ -583,8 +583,8 @@ func Test8XYE(t *testing.T) {
 		}
 
 		cpu.pc = 0x200
-		cpu.v[x] = 0x00
-		cpu.v[y] = 0xf0
+		cpu.v[x] = 0xf0
+		cpu.v[y] = 0x00
 
 		cpu.Cycle()
 
@@ -596,7 +596,7 @@ func Test8XYE(t *testing.T) {
 		}
 
 		cpu.pc = 0x200
-		cpu.v[x] = 0x00
+		cpu.v[x] = 0x0f
 		cpu.v[y] = 0x0f
 
 		cpu.Cycle()

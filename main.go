@@ -19,7 +19,7 @@ func main() {
 
 	defer eit.Destroy()
 
-	rom, err := os.ReadFile("./roms/1-chip8-logo.ch8")
+	rom, err := os.ReadFile(os.Args[1])
 
 	if err != nil {
 		log.Fatalf("Failed to read rom: %v", err)
