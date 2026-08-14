@@ -812,7 +812,7 @@ func TestEX9E(t *testing.T) {
 		t.Errorf("opcode 0x%.4x\ngot PC 0x%.4x\nwant 0x%.4x", opcode, cpu.pc, wantPc)
 	}
 
-	cpu.keyboard.Set(0x0)
+	cpu.keyboard.Set(0x0, true)
 	cpu.pc = 0x200
 	cpu.Cycle()
 
@@ -837,7 +837,7 @@ func TestEXA1(t *testing.T) {
 		t.Errorf("opcode 0x%.4x\ngot PC 0x%.4x\nwant 0x%.4x", opcode, cpu.pc, wantPc)
 	}
 
-	cpu.keyboard.Set(0x1)
+	cpu.keyboard.Set(0x1, true)
 	cpu.pc = 0x200
 	cpu.Cycle()
 

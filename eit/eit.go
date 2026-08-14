@@ -16,9 +16,10 @@ const cpuFrequency = time.Second / 700
 const timerFrequency = time.Second / 60
 
 type Eit struct {
-	mem    *memory.Memory
-	cpu    *cpu.CPU
-	scr    *screen.Screen
+	mem *memory.Memory
+	cpu *cpu.CPU
+	scr *screen.Screen
+	kbd *keyboard.Keyboard
 }
 
 func New() (Eit, error) {
@@ -40,12 +41,11 @@ func New() (Eit, error) {
 
 	cpu := cpu.New(&mem, scr, &kbd)
 
-
-
 	eit = Eit{
-		cpu:    &cpu,
-		mem:    &mem,
-		scr:    scr,
+		cpu: &cpu,
+		mem: &mem,
+		scr: scr,
+		kbd: &kbd,
 	}
 
 	return eit, nil
@@ -60,14 +60,43 @@ func (eit *Eit) Run() {
 	running := true
 
 	for running {
+		var ev sdl.Event
+
+		for sdl.PollEvent(&ev) {
+			switch ev.Type {
+			case sdl.EVENT_QUIT:
+				running = false
+			case sdl.EVENT_KEY_DOWN:
+				key, ok := keyboard.KeyMapping[ev.KeyboardEvent().Key]
+
+				if !ok {
+					continue
+				}
+				
+				eit.kbd.Set(key, true)
+			case sdl.EVENT_KEY_UP:
+				key, ok := keyboard.KeyMapping[ev.KeyboardEvent().Key]	
+				
+				if !ok {
+					continue
+				}
+
+				eit.kbd.Set(key, false)
+
+				if eit.cpu.WaitingInput() {
+					eit.cpu.Input(key)
+				}
+			}
+		}
+
 		now := time.Now()
 		elapsed := now.Sub(lastCycle)
 		lastCycle = now
-
+		
 		cpuAcc += elapsed
 		timerAcc += elapsed
 
-		for cpuAcc >= cpuFrequency {
+		for cpuAcc >= cpuFrequency && !eit.cpu.WaitingInput() {
 			eit.cpu.Cycle()
 			cpuAcc -= cpuFrequency
 		}
@@ -77,21 +106,11 @@ func (eit *Eit) Run() {
 			timerAcc -= timerFrequency
 		}
 
-		if eit.cpu.WaitingInput() {
-			key := uint8(0x0)
-			// handle input
-			eit.cpu.Input(key)
+
+		if eit.cpu.ShouldDraw() {
+			eit.scr.Update()
+			eit.cpu.ResetDrawFlag()
 		}
-
-		var ev sdl.Event
-
-		for sdl.PollEvent(&ev) {
-			if ev.Type == sdl.EVENT_QUIT {
-				running = false
-			}
-		}
-
-		eit.scr.Update()
 	}
 }
 

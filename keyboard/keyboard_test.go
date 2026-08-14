@@ -9,7 +9,7 @@ func TestSet(t *testing.T) {
 	ki := uint8(0x8)
 
 	want := true
-	key.Set(ki)
+	key.Set(ki, true)
 	got := key.keys[ki]
 
 	if got != want {
@@ -17,7 +17,7 @@ func TestSet(t *testing.T) {
 	}
 
 	want = false
-	key.Set(ki)
+	key.Set(ki, false)
 	got = key.keys[ki]
 
 	if got != want {
