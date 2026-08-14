@@ -1,11 +1,30 @@
 package main
 
-import "fmt"
+import (
+	"eit/eit"
+	"log"
+	"os"
+
+	"github.com/Zyko0/go-sdl3/bin/binsdl"
+)
 
 func main() {
-	test := [32][64]int{}
+	defer binsdl.Load().Unload()
 
-	for row, column := range test {
-		fmt.Println(row, column)
+	eit, err := eit.New()
+
+	if err != nil {
+		log.Fatalf("Failed to init Eit: %v", err)
 	}
+
+	defer eit.Destroy()
+
+	rom, err := os.ReadFile("./roms/1-chip8-logo.ch8")
+
+	if err != nil {
+		log.Fatalf("Failed to read rom: %v", err)
+	}
+
+	eit.LoadRom(rom)
+	eit.Run()
 }

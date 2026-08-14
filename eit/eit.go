@@ -6,30 +6,49 @@ import (
 	"eit/keyboard"
 	"eit/memory"
 	"eit/screen"
+	"fmt"
 	"time"
+
+	"github.com/Zyko0/go-sdl3/sdl"
 )
 
-const cpuFrequency = time.Second / 500
+const cpuFrequency = time.Second / 700
 const timerFrequency = time.Second / 60
 
 type Eit struct {
-	mem *memory.Memory
-	cpu *cpu.CPU
+	mem    *memory.Memory
+	cpu    *cpu.CPU
+	scr    *screen.Screen
 }
 
-func New() Eit {
+func New() (Eit, error) {
+	var eit Eit
+
 	mem := memory.Memory{}
-	scr := screen.Screen{}
 	kbd := keyboard.Keyboard{}
 
 	loadFonts(&mem)
 
-	cpu := cpu.New(&mem, &scr, &kbd)
+	background := sdl.Color{R: 18, G: 40, B: 76}
+	pixel := sdl.Color{R: 138, G: 175, B: 234}
 
-	return Eit{
-		mem: &mem,
-		cpu: &cpu,
+	scr, err := screen.New(64, 32, background, pixel)
+
+	if err != nil {
+		return eit, fmt.Errorf("init render: %w", err)
 	}
+
+	cpu := cpu.New(&mem, scr, &kbd)
+
+
+
+	eit = Eit{
+		cpu:    &cpu,
+		mem:    &mem,
+		scr:    scr,
+	}
+
+	return eit, nil
 }
 
 func (eit *Eit) Run() {
@@ -38,22 +57,24 @@ func (eit *Eit) Run() {
 	cpuAcc := time.Duration(0)
 	timerAcc := time.Duration(0)
 
-	for {
+	running := true
+
+	for running {
 		now := time.Now()
 		elapsed := now.Sub(lastCycle)
 		lastCycle = now
 
 		cpuAcc += elapsed
 		timerAcc += elapsed
-		
+
 		for cpuAcc >= cpuFrequency {
-			eit.cpu.Cycle()	
-			cpuAcc--
+			eit.cpu.Cycle()
+			cpuAcc -= cpuFrequency
 		}
 
 		for timerAcc >= timerFrequency {
 			eit.cpu.TickTimers()
-			timerAcc--
+			timerAcc -= timerFrequency
 		}
 
 		if eit.cpu.WaitingInput() {
@@ -62,9 +83,20 @@ func (eit *Eit) Run() {
 			eit.cpu.Input(key)
 		}
 
+		var ev sdl.Event
 
-		// handle graphics
+		for sdl.PollEvent(&ev) {
+			if ev.Type == sdl.EVENT_QUIT {
+				running = false
+			}
+		}
+
+		eit.scr.Update()
 	}
+}
+
+func (eit Eit) Destroy() {
+	eit.scr.Destroy()
 }
 
 func (eit *Eit) LoadRom(rom []byte) {
@@ -79,7 +111,7 @@ func (eit *Eit) LoadRom(rom []byte) {
 func loadFonts(mem *memory.Memory) {
 	for i, f := range font.Fonts() {
 		for j, byte := range f {
-			mem.Write(uint16(i * 5 + j), byte)	
+			mem.Write(uint16(i*5+j), byte)
 		}
 	}
 }
