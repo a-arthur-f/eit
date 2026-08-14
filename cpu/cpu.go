@@ -26,6 +26,7 @@ type CPU struct {
 	keyboard *keyboard.Keyboard
 
 	waitingInput bool
+	shouldDraw   bool
 }
 
 func New(mem *memory.Memory, screen *screen.Screen, keyboard *keyboard.Keyboard) CPU {
@@ -65,6 +66,14 @@ func (cpu *CPU) TickTimers() {
 	if cpu.timer_sound > 0 {
 		cpu.timer_sound--
 	}
+}
+
+func (cpu CPU) ShouldDraw() bool {
+	return cpu.shouldDraw
+}
+
+func (cpu *CPU) ResetDrawFlag() {
+	cpu.shouldDraw = false
 }
 
 func (cpu *CPU) execute(opcode uint8) {
@@ -274,7 +283,7 @@ func (cpu *CPU) execute(opcode uint8) {
 			cols := cpu.mem.Read(cpu.i + line)
 
 			for col := 0x7; col >= 0; col-- {
-				x := (cpu.v[xIndex] + (0x7-uint8(col)))%screen.ScreenWidth
+				x := (cpu.v[xIndex] + (0x7 - uint8(col))) % screen.ScreenWidth
 				y := (cpu.v[yIndex] + uint8(line)) % screen.ScreenHeight
 
 				spriteBit := ((cols & uint8(1<<col)) >> col) != 0
@@ -289,16 +298,18 @@ func (cpu *CPU) execute(opcode uint8) {
 			}
 		}
 
+		cpu.shouldDraw = true
 		cpu.pc += 2
 	case 0xe0:
 		addr := cpu.getAddress()
 
 		instruction := addr & 0x0ff
-		index := (opcode & 0x0f) >> 4
+		index := (opcode & 0x0f)
 		keyAddr := cpu.v[index]
 
 		switch instruction {
 		case 0x9e:
+			fmt.Printf("tecla 0x%.x %v\n", index, cpu.keyboard.Read(index))
 			if cpu.keyboard.Read(keyAddr) {
 				cpu.pc += 4
 			} else {
