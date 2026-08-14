@@ -198,10 +198,10 @@ func (cpu *CPU) execute(opcode uint8) {
 		case 0x6:
 			fmt.Printf("V[%d] >>= V[%d]\n", x, y)
 
-			leastBit := cpu.v[x] & 0x01
+			leastBit := cpu.v[y] & 0x01
 			cpu.v[0xf] = leastBit
 
-			cpu.v[x] >>= cpu.v[y]
+			cpu.v[x] = cpu.v[y] >> 1
 		case 0x7:
 			fmt.Printf("V[%d] =- V[%d] with borrow\n", x, y)
 

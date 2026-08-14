@@ -475,7 +475,7 @@ func Test8XY6(t *testing.T) {
 		cpu.v[x] = uint8(x)
 		cpu.v[y] = uint8(y)
 
-		want := cpu.v[x] >> cpu.v[y]
+		want := cpu.v[y] >> 1
 
 		cpu.Cycle()
 
@@ -487,7 +487,7 @@ func Test8XY6(t *testing.T) {
 
 		cpu.pc = 0x200
 		cpu.v[x] = 0x01
-		cpu.v[y] = 0xff
+		cpu.v[y] = 0x0f
 
 		cpu.Cycle()
 
@@ -500,7 +500,7 @@ func Test8XY6(t *testing.T) {
 
 		cpu.pc = 0x200
 		cpu.v[x] = 0x00
-		cpu.v[y] = 0xff
+		cpu.v[y] = 0xf0
 
 		cpu.Cycle()
 
