@@ -183,8 +183,8 @@ func (cpu *CPU) execute(opcode uint8) {
 		case 0x4:
 			fmt.Printf("V[%d] += V[%d] with carry\n", x, y)
 
-			cpu.v[x] += cpu.v[y]
 			carry := uint32(cpu.v[x])+uint32(cpu.v[y]) > 0xff
+			cpu.v[x] += cpu.v[y]
 
 			if carry {
 				cpu.v[0xf] = 0x1
