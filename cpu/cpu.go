@@ -217,10 +217,10 @@ func (cpu *CPU) execute(opcode uint8) {
 		case 0xe:
 			fmt.Printf("V[%d] <<= V[%d]\n", x, y)
 
-			mostBit := cpu.v[x] & 0x80
+			mostBit := cpu.v[y] & 0x80
 			cpu.v[0xf] = mostBit >> 7
 
-			cpu.v[x] <<= cpu.v[y]
+			cpu.v[x] = cpu.v[y] << 1
 
 		default:
 			fmt.Printf("unknow instruction 0x%.1x for opcode 0x%.2x\n", instruction, opcode)
