@@ -213,8 +213,8 @@ func (cpu *CPU) execute(opcode uint8) {
 		case 0x7:
 			fmt.Printf("V[%d] =- V[%d] with borrow\n", x, y)
 
-			cpu.v[x] = cpu.v[y] - cpu.v[x]
 			borrow := cpu.v[y] < cpu.v[x]
+			cpu.v[x] = cpu.v[y] - cpu.v[x]
 
 			if borrow {
 				cpu.v[0xf] = 0x0
