@@ -75,16 +75,15 @@ func (s Screen) Read(x uint8, y uint8) bool {
 }
 
 func (s *Screen) Update() {
-	s.renderer.SetDrawColor(s.background.R, s.background.G, s.background.B, 0)
-	s.renderer.Clear()
-
-	s.renderer.SetDrawColor(s.pixel.R, s.pixel.G, s.pixel.B, 0)
-
 	for y := range ScreenHeight {
 		for x := range ScreenWidth {
 			if s.Read(uint8(x), uint8(y)) {
-				s.renderer.RenderPoint(float32(x), float32(y))
+				s.renderer.SetDrawColor(s.pixel.R, s.pixel.G, s.pixel.B, 0)
+			} else {
+				s.renderer.SetDrawColor(s.background.R, s.background.G, s.background.B, 0)
 			}
+
+			s.renderer.RenderPoint(float32(x), float32(y))
 		}
 	}
 
