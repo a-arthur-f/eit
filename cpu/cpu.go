@@ -174,12 +174,15 @@ func (cpu *CPU) execute(opcode uint8) {
 		case 0x1:
 			fmt.Printf("V[%d] |= V[%d]\n", x, y)
 			cpu.v[x] |= cpu.v[y]
+			cpu.v[0xf] = 0x0
 		case 0x2:
 			fmt.Printf("V[%d] &= V[%d]\n", x, y)
 			cpu.v[x] &= cpu.v[y]
+			cpu.v[0xf] = 0x0
 		case 0x3:
 			fmt.Printf("V[%d] ^= V[%d]\n", x, y)
 			cpu.v[x] ^= cpu.v[y]
+			cpu.v[0xf] = 0x0
 		case 0x4:
 			fmt.Printf("V[%d] += V[%d] with carry\n", x, y)
 
