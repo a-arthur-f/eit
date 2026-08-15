@@ -12,7 +12,7 @@ import (
 	"github.com/Zyko0/go-sdl3/sdl"
 )
 
-const cpuFrequency = time.Second / 700
+const cpuFrequency = time.Second / 500
 const timerFrequency = time.Second / 60
 
 type Eit struct {
@@ -105,7 +105,6 @@ func (eit *Eit) Run() {
 			eit.cpu.TickTimers()
 			timerAcc -= timerFrequency
 		}
-
 
 		if eit.cpu.ShouldDraw() {
 			eit.scr.Update()
