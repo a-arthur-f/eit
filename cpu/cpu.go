@@ -337,7 +337,7 @@ func (cpu *CPU) execute(opcode uint8) {
 		case 0x1e:
 			cpu.i += uint16(cpu.v[index])
 		case 0x29:
-			cpu.i += font.Address(cpu.v[index])
+			cpu.i = font.Address(cpu.v[index])
 		case 0x33:
 			number := cpu.v[index]
 
