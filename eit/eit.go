@@ -128,9 +128,11 @@ func (eit *Eit) LoadRom(rom []byte) {
 }
 
 func loadFonts(mem *memory.Memory) {
-	for i, f := range font.Fonts() {
-		for j, byte := range f {
-			mem.Write(uint16(i*5+j), byte)
+	fonts := font.Fonts()
+
+	for ifont, font := range fonts {
+		for ibyte, byte := range font  {
+			mem.Write(uint16((ifont * len(font)) + ibyte), byte)
 		}
 	}
 }
