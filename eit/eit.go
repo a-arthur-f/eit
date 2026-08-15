@@ -14,6 +14,7 @@ import (
 
 const cpuFrequency = time.Second / 500
 const timerFrequency = time.Second / 60
+const screenFrequency = time.Second / 60
 
 type Eit struct {
 	mem *memory.Memory
@@ -56,6 +57,7 @@ func (eit *Eit) Run() {
 
 	cpuAcc := time.Duration(0)
 	timerAcc := time.Duration(0)
+	screenAcc := time.Duration(0)
 
 	running := true
 
@@ -95,6 +97,7 @@ func (eit *Eit) Run() {
 		
 		cpuAcc += elapsed
 		timerAcc += elapsed
+		screenAcc += elapsed
 
 		for cpuAcc >= cpuFrequency && !eit.cpu.WaitingInput() {
 			eit.cpu.Cycle()
@@ -106,10 +109,13 @@ func (eit *Eit) Run() {
 			timerAcc -= timerFrequency
 		}
 
-		if eit.cpu.ShouldDraw() {
+		if screenAcc >= screenFrequency && eit.cpu.ShouldDraw() {
 			eit.scr.Update()
 			eit.cpu.ResetDrawFlag()
+
+			screenAcc -= screenFrequency
 		}
+
 	}
 }
 
