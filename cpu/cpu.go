@@ -273,28 +273,43 @@ func (cpu *CPU) execute(opcode uint8) {
 		cpu.pc += 2
 	case 0xd0:
 		addr := cpu.getAddress()
-		lines := addr & 0x00f
+
+		rows := addr & 0x00f
 		xIndex := (addr & 0xf00) >> 8
 		yIndex := (addr & 0x0f0) >> 4
 
+		startX := cpu.v[xIndex] % screen.ScreenWidth
+		startY := cpu.v[yIndex] % screen.ScreenHeight
+
 		cpu.v[0xf] = 0x0
 
-		for line := range lines {
-			cols := cpu.mem.Read(cpu.i + line)
+		for row := range rows {
+			y := startY + uint8(row)
 
-			for col := 0x7; col >= 0; col-- {
-				x := (cpu.v[xIndex] + (0x7 - uint8(col))) % screen.ScreenWidth
-				y := (cpu.v[yIndex] + uint8(line)) % screen.ScreenHeight
+			if y >= screen.ScreenHeight {
+				break
+			}
 
-				spriteBit := ((cols & uint8(1<<col)) >> col) != 0
+			bits := cpu.mem.Read(cpu.i + row)
+
+			for bitPos := 7; bitPos >= 0; bitPos-- {
+				x := startX + uint8(7 - bitPos)
+
+				if x >= screen.ScreenWidth {
+					break
+				}
+
+				spriteBit := ((bits & uint8(1<<bitPos)) >> bitPos) != 0
 				screenBit := cpu.screen.Read(x, y)
 
 				fmt.Printf("set screen pixel(%d, %d) to %v\n", x, y, spriteBit != screenBit)
 				cpu.screen.Write(x, y, spriteBit != screenBit)
 
-				if spriteBit == screenBit {
+				if spriteBit && screenBit {
 					cpu.v[0xf] = 0x1
 				}
+
+				x = (x + 1) % screen.ScreenWidth
 			}
 		}
 
